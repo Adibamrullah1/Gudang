@@ -90,6 +90,28 @@ export default function InvoiceDetailPage() {
   const status = (order['Status'] || order.status || 'Pending');
   const isLunas = status.toLowerCase() === 'lunas';
 
+  // Parse items from string: "Title (Qtyx @ Price)"
+  const rawItemsString = order['Judul Buku'] || order['Buku'] || '';
+  const parsedItems: any[] = [];
+  const regex = /(.+?)\s*\((\d+)x\s*@\s*(\d+)\)/g;
+  let match;
+  while ((match = regex.exec(rawItemsString)) !== null) {
+    parsedItems.push({
+      title: match[1].trim(),
+      qty: Number(match[2]),
+      price: Number(match[3]),
+    });
+  }
+  
+  // Fallback for old orders where Judul Buku was just a plain string
+  if (parsedItems.length === 0 && rawItemsString) {
+    parsedItems.push({
+      title: rawItemsString,
+      qty: Number(order['Jumlah'] || order['Qty'] || 1),
+      price: Number(order['Harga Satuan'] || 0),
+    });
+  }
+
   return (
     <>
       {/* Print Styles */}
@@ -184,22 +206,42 @@ export default function InvoiceDetailPage() {
 
           {/* Order Details */}
           <div className="p-8">
-            <div className="grid grid-cols-2 gap-8 mb-8">
-              <div>
-                <h3 className="text-xs uppercase text-slate-400 font-semibold mb-2 tracking-wide">Info Pesanan</h3>
-                <div className="space-y-1 text-sm">
-                  <p><span className="text-slate-500">ID Order:</span> <span className="font-semibold text-slate-800">{order['ID Order'] || order.id}</span></p>
-                  <p><span className="text-slate-500">Nama:</span> <span className="font-semibold text-slate-800">{order['Nama'] || order['Customer'] || '-'}</span></p>
-                  <p><span className="text-slate-500">Institusi:</span> <span className="font-semibold text-slate-800">{order['Instansi'] || order['Institusi'] || '-'}</span></p>
-                  <p><span className="text-slate-500">No. WA:</span> <span className="font-semibold text-slate-800">{order['Nomor WA'] || order['No HP'] || '-'}</span></p>
-                </div>
+            <div className="mb-8">
+              <h3 className="text-xs uppercase text-slate-400 font-semibold mb-2 tracking-wide">Info Pesanan</h3>
+              <div className="space-y-1 text-sm grid grid-cols-2 gap-4">
+                <p><span className="text-slate-500">ID Order:</span> <span className="font-semibold text-slate-800">{order['ID Order'] || order.id}</span></p>
+                <p><span className="text-slate-500">Nama:</span> <span className="font-semibold text-slate-800">{order['Nama'] || order['Customer'] || '-'}</span></p>
+                <p><span className="text-slate-500">Institusi:</span> <span className="font-semibold text-slate-800">{order['Instansi'] || order['Institusi'] || '-'}</span></p>
+                <p><span className="text-slate-500">No. WA:</span> <span className="font-semibold text-slate-800">{order['Nomor WA'] || order['No HP'] || order['No WA'] || '-'}</span></p>
+                <p><span className="text-slate-500">Ekspedisi:</span> <span className="font-semibold text-slate-800">{order['Ekspedisi'] || '-'}</span></p>
+                <p><span className="text-slate-500">Alamat:</span> <span className="font-semibold text-slate-800">{order['Alamat Lengkap'] || order['Alamat'] || '-'}</span></p>
               </div>
-              <div>
-                <h3 className="text-xs uppercase text-slate-400 font-semibold mb-2 tracking-wide">Detail Buku</h3>
-                <div className="space-y-1 text-sm">
-                  <p><span className="text-slate-500">Judul:</span> <span className="font-semibold text-slate-800">{order['Judul Buku'] || order['Buku'] || '-'}</span></p>
-                  <p><span className="text-slate-500">Jumlah:</span> <span className="font-semibold text-slate-800">{order['Jumlah'] || order['Qty'] || '-'} eksemplar</span></p>
-                </div>
+            </div>
+
+            {/* Rincian Produk */}
+            <div className="mb-8">
+              <h3 className="text-xs uppercase text-slate-400 font-semibold mb-3 tracking-wide">Detail Produk</h3>
+              <div className="border border-slate-200 rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50">
+                    <tr>
+                      <th className="text-left px-6 py-3 text-xs uppercase text-slate-500 font-semibold">Judul Buku</th>
+                      <th className="text-right px-6 py-3 text-xs uppercase text-slate-500 font-semibold">Harga Satuan</th>
+                      <th className="text-center px-6 py-3 text-xs uppercase text-slate-500 font-semibold">Jumlah</th>
+                      <th className="text-right px-6 py-3 text-xs uppercase text-slate-500 font-semibold">Subtotal</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parsedItems.map((item, idx) => (
+                      <tr key={idx} className="border-t border-slate-100">
+                        <td className="px-6 py-3 text-slate-800 font-medium">{item.title}</td>
+                        <td className="px-6 py-3 text-right text-slate-600">{item.price ? formatRp(item.price) : '-'}</td>
+                        <td className="px-6 py-3 text-center text-slate-800 font-medium">{item.qty}</td>
+                        <td className="px-6 py-3 text-right text-slate-800 font-semibold">{item.price ? formatRp(item.price * item.qty) : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 

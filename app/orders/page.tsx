@@ -174,9 +174,10 @@ export default function OrdersPage() {
                 <tr>
                   <th className="px-6 py-4 font-semibold">ID Pesanan</th>
                   <th className="px-6 py-4 font-semibold">Tanggal</th>
+                  <th className="px-6 py-4 font-semibold">Pemesan</th>
+                  <th className="px-6 py-4 font-semibold">Produk</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
                   <th className="px-6 py-4 font-semibold">Total Harga</th>
-                  <th className="px-6 py-4 font-semibold">Telah Dibayar</th>
                   <th className="px-6 py-4 font-semibold">Sisa Bayar</th>
                 </tr>
               </thead>
@@ -191,13 +192,18 @@ export default function OrdersPage() {
                     <motion.tr 
                       variants={itemVariants}
                       key={item.id || i} 
+                      onClick={() => { if (item.id || item['ID Order']) window.location.href = `/invoices/${encodeURIComponent(item.id || item['ID Order'])}` }}
                       className="border-b border-slate-50 hover:bg-emerald-50/30 transition-colors cursor-pointer"
                     >
                       <td className="px-6 py-4 font-bold text-slate-900">{item['ID Order'] || item.id || '-'}</td>
                       <td className="px-6 py-4 text-slate-600">{item['Tanggal'] || item.order_date || '-'}</td>
+                      <td className="px-6 py-4 text-slate-800">{item['Nama'] || item.customer_name || '-'}</td>
+                      <td className="px-6 py-4 text-slate-800">
+                        {item['Judul Buku'] || item.book_title || '-'} 
+                        <span className="text-slate-500 text-xs ml-1">x{item['Qty'] || item.qty || 1}</span>
+                      </td>
                       <td className="px-6 py-4">{getStatusBadge(item['Status'] || item.status)}</td>
                       <td className="px-6 py-4 text-slate-800 font-medium">{formatRp(totalHarga)}</td>
-                      <td className="px-6 py-4 text-emerald-600 font-medium">{formatRp(totalTerbayar)}</td>
                       <td className="px-6 py-4">
                         {status === 'cicilan' && sisaBayar > 0 ? (
                           <div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Users, Search, Loader2, Plus } from "lucide-react";
 import { fetchSheetData } from "@/lib/google-sheets";
+import Link from "next/link";
 
 export default function CustomersPage() {
   const [data, setData] = useState<any[]>([]);
@@ -47,14 +48,16 @@ export default function CustomersPage() {
           </h2>
           <p className="text-slate-500 mt-1">Kelola data pemesan, sekolah, dan institusi.</p>
         </div>
-        <motion.button 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-md shadow-orange-500/20 flex items-center gap-2"
-        >
-          <Plus className="h-5 w-5" />
-          Tambah Pelanggan
-        </motion.button>
+        <Link href="/customers/new">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-md shadow-orange-500/20 flex items-center gap-2"
+          >
+            <Plus className="h-5 w-5" />
+            Tambah Pelanggan
+          </motion.button>
+        </Link>
       </motion.div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">

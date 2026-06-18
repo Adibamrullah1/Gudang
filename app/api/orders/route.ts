@@ -22,8 +22,16 @@ export async function POST(request: Request) {
     const sheetPayload: Record<string, unknown> = {
       'ID Order': validData.id,
       'Tanggal': validData.order_date,
-      'Status': validData.status,
+      'Nama': validData.customer_name,
+      'Instansi': validData.institution || '',
+      'No WA': validData.phone_number,
+      'Ekspedisi': validData.ekspedisi || '',
+      'Alamat Lengkap': validData.alamat || '',
+      'Judul Buku': validData.items.map((item: any) => `${item.title} (${item.qty}x @ ${item.price})`).join(', '),
+      'Qty': validData.items.reduce((acc: number, item: any) => acc + item.qty, 0),
+      'Harga Satuan': 0,
       'Harga Total': validData.total_amount,
+      'Status': validData.status,
       'Total Terbayar': validData.paid_amount,
     };
 

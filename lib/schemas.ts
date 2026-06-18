@@ -24,7 +24,17 @@ export type Product = z.infer<typeof ProductSchema>;
 // Skema untuk Validasi Order (Pesanan)
 export const OrderSchema = z.object({
   id: z.string(), // misal: ORD-001
-  customer_id: z.string().uuid(),
+  customer_id: z.string().uuid().optional(),
+  customer_name: z.string(),
+  institution: z.string().optional(),
+  phone_number: z.string(),
+  ekspedisi: z.string().optional(),
+  alamat: z.string().optional(),
+  items: z.array(z.object({
+    title: z.string(),
+    qty: z.number().positive(),
+    price: z.number().nonnegative(),
+  })).min(1),
   order_date: z.string(), // YYYY-MM-DD
   status: z.enum(['Pending', 'Cicilan', 'Lunas']),
   total_amount: z.number().nonnegative(),
